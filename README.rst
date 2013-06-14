@@ -20,6 +20,11 @@ capabilities to your Django projects. Django OAuth Toolkit makes extensive use o
 `OAuthLib <https://github.com/idan/oauthlib>`_, so that everything is
 `rfc-compliant <http://tools.ietf.org/html/rfc6749>`_.
 
+Support
+-------
+
+If you need support please send a message to the `Django OAuth Toolkit Google Group <http://groups.google.com/group/django-oauth-toolkit>`_
+
 Requirements
 ------------
 
@@ -74,6 +79,17 @@ Highest priority first
 
 Changelog
 ---------
+
+0.3.0 [2013-06-14]
+
+ * `Django REST Framework <http://django-rest-framework.org/>`_ integration layer
+ * Bugfix #13: Populate request with client and user in validate_bearer_token
+ * Bugfix #12: Fix paths in documentation
+
+**Backwards incompatible changes in 0.3.0**
+
+ * `requested_scopes` parameter in ScopedResourceMixin changed to `required_scopes`
+
 0.2.1 [2013-06-06]
 
  * Core optimizations
