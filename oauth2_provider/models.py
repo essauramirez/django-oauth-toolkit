@@ -47,7 +47,7 @@ class Application(models.Model):
     client_id = models.CharField(max_length=100, unique=True, default=generate_client_id)
     user = models.ForeignKey(User)
     redirect_uris = models.TextField(help_text=_("Allowed URIs list, space separated"),
-                                     validators=[validate_uris], blank=True)  # TODO validate this field depending on authorization_grant_type
+                                     validators=[validate_uris], blank=True)
     client_type = models.CharField(max_length=32, choices=CLIENT_TYPES)
     authorization_grant_type = models.CharField(max_length=32, choices=GRANT_TYPES)
     client_secret = models.CharField(max_length=255, blank=True, default=generate_client_secret)
@@ -58,7 +58,11 @@ class Application(models.Model):
         """
         Returns the default redirect_uri extracting the first item from the :attr:`redirect_uris` string
         """
-        return self.redirect_uris.split().pop(0)
+        if self.redirect_uris:
+            return self.redirect_uris.split().pop(0)
+
+        assert False, "If you are using implicit, authorization_code or all-in-one grant_type, you must define " \
+                      "redirect_uris field in your Application model"
 
     def redirect_uri_allowed(self, uri):
         """
@@ -67,6 +71,14 @@ class Application(models.Model):
         :param uri: Url to check
         """
         return uri in self.redirect_uris.split()
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if not self.redirect_uris and self.authorization_grant_type in (Application.GRANT_ALLINONE,
+                                                                        Application.GRANT_AUTHORIZATION_CODE,
+                                                                        Application.GRANT_IMPLICIT):
+            raise ValidationError(
+                _('Redirect_uris could not be empty with {} grant_type'.format(self.authorization_grant_type)))
 
     def __unicode__(self):
         return self.client_id
